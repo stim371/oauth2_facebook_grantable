@@ -25,7 +25,7 @@ module Devise
       begin
         @@logger.error("Oauth2FacebookGrantable => Getting information from user token: #{token}")
         @graph = Koala::Facebook::API.new(token)
-        return @graph.get_object("me")
+        return @graph.get_object("me", {'fields' => "id,name,first_name,last_name,email,gender,picture"})
       rescue => e
         @@logger.error("Oauth2FacebookGrantable => Could not authenticate with token: #{e}")
         return false
