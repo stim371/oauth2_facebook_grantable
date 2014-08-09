@@ -15,20 +15,27 @@ module Devise
           Devise::Oauth2ProvidableFacebook.logger.debug("Oauth2FacebookGrantTypeStrategy => Could not find user with facebook identifer:\"#{params[:uid]}\"")
           fb_user = Devise::Oauth2ProvidableFacebook.facebook_user_for_token(params[:facebook_access_token])
           if(fb_user && fb_user["email"])
-             Devise::Oauth2ProvidableFacebook.logger.debug("Oauth2FacebookGrantTypeStrategy => Falling back to email:\"#{fb_user["email"]}\"")
-             resource = mapping.to.find_for_authentication(:email => fb_user["email"].to_s)
-             if(resource)
-               Devise::Oauth2ProvidableFacebook.logger.debug("Oauth2FacebookGrantTypeStrategy => Found user with email:\"#{fb_user["email"]}\" saving facebook_idenfier: #{fb_user["id"]}")
-               resource.uid = fb_user["id"].to_s
-               resource.name = fb_user["name"].to_s
-               resource.firstname = fb_user["first_name"].to_s
-               resource.lastname = fb_user["last_name"].to_s
-               resource.gender = fb_user["gender"].to_s
-               resource.email = fb_user["email"].to_s
-               resource.picture_url = fb_user["picture"]["data"]["url"].to_s
-               resource.save
-             end
-           end
+            Devise::Oauth2ProvidableFacebook.logger.debug("Oauth2FacebookGrantTypeStrategy => Falling back to email:\"#{fb_user["email"]}\"")
+            resource = mapping.to.find_for_authentication(:email => fb_user["email"].to_s)
+
+            if(!resource)
+              if email = fb_user["email"].to_s and email.present?
+                resource = mapping.to.create(:email => email)
+              end
+            end
+
+            if(resource)
+              Devise::Oauth2ProvidableFacebook.logger.debug("Oauth2FacebookGrantTypeStrategy => Found user with email:\"#{fb_user["email"]}\" saving facebook_idenfier: #{fb_user["id"]}")
+              resource.uid = fb_user["id"].to_s
+              resource.name = fb_user["name"].to_s
+              resource.firstname = fb_user["first_name"].to_s
+              resource.lastname = fb_user["last_name"].to_s
+              resource.gender = fb_user["gender"].to_s
+              resource.email = fb_user["email"].to_s
+              resource.picture_url = fb_user["picture"]["data"]["url"].to_s
+              resource.save
+            end
+          end
         end
 
         Devise::Oauth2ProvidableFacebook.logger.debug("Oauth2FacebookGrantTypeStrategy => Validating access token for user with facebook identifier:\"#{params[:uid]}\"")
