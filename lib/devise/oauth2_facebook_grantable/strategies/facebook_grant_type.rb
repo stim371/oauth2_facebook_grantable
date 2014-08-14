@@ -20,7 +20,7 @@ module Devise
 
             if(!resource)
               if email = fb_user["email"].to_s and email.present?
-                resource = mapping.to.create(:email => email)
+                resource = mapping.to.create(:email => email, :password => Devise.friendly_token[0,20])
               end
             end
 
